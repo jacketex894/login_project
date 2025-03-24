@@ -13,8 +13,19 @@ services:
 
   frontend:
     build: ./frontend
+    env_file:
+      - .env
     container_name: login-frontend
     environment:
       - FRONTEND_PORT=${FRONTEND_PORT}
     ports:
       - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+  
+  mysql_db:
+    build: ./mysql
+    env_file:
+      - .env
+    container_name: mysql
+    restart: always
+    ports:
+      - "${DATABASE_PORT}:${DATABASE_PORT}"
