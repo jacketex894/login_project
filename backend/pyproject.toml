@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "login-backend"
+version = "0.1.0"
+description = ""
+authors = ["JUNYAN,ZHAO"]
+
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.11"
+uvicorn = "^0.34.0"
+bcrypt = "^4.3.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

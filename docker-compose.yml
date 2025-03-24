@@ -1,0 +1,20 @@
+services:
+  backend:
+    build: ./backend    
+    env_file:
+      - .env
+    environment:
+      - BACKEND_PORT=${BACKEND_PORT}
+    volumes:
+      - ./backend/system:/app/system
+    container_name: login-backend
+    ports:
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
+
+  frontend:
+    build: ./frontend
+    container_name: login-frontend
+    environment:
+      - FRONTEND_PORT=${FRONTEND_PORT}
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
