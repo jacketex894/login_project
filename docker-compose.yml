@@ -10,11 +10,32 @@ services:
     container_name: login-backend
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
-
-  frontend:
-    build: ./frontend
-    container_name: login-frontend
-    environment:
-      - FRONTEND_PORT=${FRONTEND_PORT}
+    networks:
+      - app-network
+  nginx:
+    build: ./nginx
+    env_file:
+      - .env
+    container_name: nginx
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - backend
     ports:
       - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+    networks:
+      - app-network
+  mysql_db:
+    build: ./mysql
+    env_file:
+      - .env
+    container_name: mysql
+    restart: always
+    ports:
+      - "${DATABASE_PORT}:${DATABASE_PORT}"
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
