@@ -8,11 +8,11 @@ RUN apt-get update
 
 COPY poetry.lock pyproject.toml ./
 
-COPY system ./system
+COPY login_backend ./login_backend
 
-RUN poetry install --no-root  && rm -rf $POETRY_CACHE_DIR
+RUN poetry install && rm -rf $POETRY_CACHE_DIR
 
 #set PATH for poetry
 ENV PATH="/root/.local/bin:${PATH}"
 
-CMD ["sh", "-c", "poetry run uvicorn system.main:app --host 0.0.0.0 --port $BACKEND_PORT --reload"]
+CMD ["sh", "-c", "poetry run uvicorn login_backend.main:app --host 0.0.0.0 --port $BACKEND_PORT --reload"]
