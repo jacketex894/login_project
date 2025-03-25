@@ -1,4 +1,4 @@
-
+const BASE_URL = '/api';
 
 export function login(account,password){
     let data = {'account':account,'password':password}

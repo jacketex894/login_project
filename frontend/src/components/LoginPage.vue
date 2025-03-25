@@ -10,7 +10,7 @@
             <input v-model="password"/>
         </div> 
     </div>
-    <button v-on:click="show()"> Login </button>
+    <button v-on:click="test()"> Login </button>
 </template>
 <script>
 
@@ -23,7 +23,7 @@ export default {
         };
     },
     methods:{
-        show(){
+        test(){
             login(this.account,this.password)
         }
     }

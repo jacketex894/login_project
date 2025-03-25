@@ -10,7 +10,11 @@ if [ -z "$FRONTEND_PORT" ]; then
   exit 1
 fi
 
-sed "s/\${FRONTEND_PORT}/$FRONTEND_PORT/g" $NGINX_TEMPLATE_FILE > $NGINX_CONFIG_FILE
+sed -e "s/\${FRONTEND_PORT}/$FRONTEND_PORT/g" \
+    -e "s/\${BACKEND_PORT}/$BACKEND_PORT/g" \
+    $NGINX_TEMPLATE_FILE > $NGINX_CONFIG_FILE
 
-echo "New Nginx config file generated: $FRONTEND_PORT"
+echo "New Nginx config file generated"
+echo "FRONTEND_PORT : $FRONTEND_PORT"
+echo "BACKEND_PORT : $BACKEND_PORT"
 
