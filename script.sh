@@ -60,6 +60,17 @@ cd frontend || exit
 npm run build
 cd "$current_dir"
 
+#TODO:check other config can replace to use envsubst or not
+#backend
+BACKEND_TEMPLATE_FILE="./backend/login_backend/config_template.yaml"
+BACKEND_CONFIG_FILE="./backend/login_backend/config.yaml"
+
+export MYSQL_PASSWORD=$MYSQL_ROOT_PASSWORD
+export DATABASE_PORT=$DATABASE_PORT
+echo "MYSQL_PASSWORD: $MYSQL_PASSWORD"
+echo "DATABASE_PORT: $DATABASE_PORT"
+envsubst < $BACKEND_TEMPLATE_FILE > $BACKEND_CONFIG_FILE
+
 docker compose up -d
 
 echo "Frontend run at http://localhost:$FRONTEND_PORT"

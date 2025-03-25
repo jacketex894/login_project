@@ -4,3 +4,4 @@ __pycache__
 my.cnf
 nginx.conf
 nginx/certs
+config.yaml

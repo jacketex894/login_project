@@ -36,6 +36,8 @@ services:
     restart: always
     ports:
       - "${DATABASE_PORT}:${DATABASE_PORT}"
+    volumes:
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - app-network
 networks:
