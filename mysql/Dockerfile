@@ -1,5 +1,7 @@
 FROM mysql:8.0
 
+ENV MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+
 COPY my.cnf /etc/mysql/my.cnf
 
 EXPOSE $DATABASE_PORT
