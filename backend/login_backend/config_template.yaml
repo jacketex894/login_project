@@ -1,0 +1,6 @@
+mysql_db:
+  MYSQL_USER: root
+  MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  USER_DB: user_db
+  HOST: mysql_db
+  DATABASE_PORT: ${DATABASE_PORT}

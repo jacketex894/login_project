@@ -6,7 +6,7 @@ services:
     environment:
       - BACKEND_PORT=${BACKEND_PORT}
     volumes:
-      - ./backend/system:/app/system
+      - ./backend/login_backend:/app/login_backend
     container_name: login-backend
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
@@ -20,10 +20,12 @@ services:
     volumes:
       - ./frontend/dist:/usr/share/nginx/html
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/certs:/etc/nginx/certs 
     depends_on:
       - backend
     ports:
       - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+      - "${HTTPS_PORT}:${HTTPS_PORT}"
     networks:
       - app-network
   mysql_db:
@@ -34,6 +36,8 @@ services:
     restart: always
     ports:
       - "${DATABASE_PORT}:${DATABASE_PORT}"
+    volumes:
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - app-network
 networks:

@@ -1,10 +1,16 @@
 <script setup>
-import LoginPage from './components/LoginPage.vue'
 </script>
 
 <template>
-  <LoginPage />
+    <div class="controller">
+      <router-view></router-view>
+    </div>
 </template>
 
 <style scoped>
+.controller{
+  position: relative;
+  z-index: 2;
+}
+
 </style>

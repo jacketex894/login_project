@@ -3,3 +3,5 @@ __pycache__
 .env
 my.cnf
 nginx.conf
+nginx/certs
+config.yaml
