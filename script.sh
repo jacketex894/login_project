@@ -20,6 +20,20 @@ if [ ! -f "$ENV_FILE" ]; then
   echo "$NEW_ENV_CONTENT" > "$ENV_FILE"
 fi
 
+source $ENV_FILE
+
+export BACKEND_PORT=$BACKEND_PORT
+export FRONTEND_PORT=$FRONTEND_PORT
+export HTTPS_PORT=$HTTPS_PORT
+export DATABASE_PORT=$DATABASE_PORT
+export MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+export MYSQL_PASSWORD=$MYSQL_ROOT_PASSWORD
+#sql
+
+SQL_TEMPLATE_FILE="./mysql/my.cnf.template"
+SQL_CONFIG_FILE="./mysql/my.cnf"
+envsubst < $SQL_TEMPLATE_FILE > $SQL_CONFIG_FILE
+
 #cert
 if $CREATE_CERT; then
   CERT_FOLDER="nginx/certs"
@@ -38,8 +52,6 @@ fi
 NGINX_TEMPLATE_FILE="./nginx/nginx_template.conf"
 NGINX_CONFIG_FILE="./nginx/nginx.conf"
 
-source $ENV_FILE
-
 if [ -z "$FRONTEND_PORT" ]; then
   echo "Error: FRONTEND_PORT not found in $ENV_FILE"
   exit 1
@@ -50,25 +62,16 @@ sed -e "s/\${FRONTEND_PORT}/$FRONTEND_PORT/g" \
     -e "s/\${HTTPS_PORT}/$HTTPS_PORT/g" \
     $NGINX_TEMPLATE_FILE > $NGINX_CONFIG_FILE
 
-echo "New Nginx config file generated"
-echo "FRONTEND_PORT : $FRONTEND_PORT"
-echo "BACKEND_PORT : $BACKEND_PORT"
-
 #frontend
 current_dir=$(pwd)
 cd frontend || exit
 npm run build
 cd "$current_dir"
 
-#TODO:check other config can replace to use envsubst or not
 #backend
 BACKEND_TEMPLATE_FILE="./backend/login_backend/config_template.yaml"
 BACKEND_CONFIG_FILE="./backend/login_backend/config.yaml"
 
-export MYSQL_PASSWORD=$MYSQL_ROOT_PASSWORD
-export DATABASE_PORT=$DATABASE_PORT
-echo "MYSQL_PASSWORD: $MYSQL_PASSWORD"
-echo "DATABASE_PORT: $DATABASE_PORT"
 envsubst < $BACKEND_TEMPLATE_FILE > $BACKEND_CONFIG_FILE
 
 docker compose up -d
