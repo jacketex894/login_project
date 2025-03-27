@@ -1,6 +1,7 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, TIMESTAMP, create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import IntegrityError
 from typing import TypedDict
 import logging
 from fastapi import HTTPException
@@ -54,6 +55,9 @@ class UserDB:
         except Exception as e:
             session.rollback()
             logging.error(f'Error occurred: {e}')
+            raise HTTPException(
+                status_code=400,
+            )
         finally:
             session.close()
 
