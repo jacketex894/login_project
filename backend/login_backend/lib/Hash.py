@@ -30,7 +30,8 @@ class hash_argon2(Hash):
     def verify(password:str,hash_password:str) -> bool:
         ph = PasswordHasher()
         return ph.verify(hash_password,password)
-    
+
+#TODO:change to Strategy
 class HashFactory():
     @staticmethod
     def get_hash_method(hash_type:str) -> Hash:
