@@ -20,7 +20,7 @@
                     :rules="[value => required(value, 'Email')]"
                     label="Email Address"
                 ></v-text-field>
-                <v-btn class="mt-2" type="submit" block v-on:click="userRegister()">Submit</v-btn>
+                <v-btn class="submitButton" type="submit" block v-on:click="userRegister()">Submit</v-btn>
             </v-form>
         </v-sheet>
         <v-alert
@@ -36,7 +36,7 @@
     </div>
 </template>
 <script>
-import {register} from '@/utils/userDB.js'
+import {register} from '@/utils/userProfile.js'
 export default {
     name: 'Register',
     data(){
@@ -51,8 +51,8 @@ export default {
     },
     methods:{
         required(value, fieldName) {
-        if (value) return true;
-        return `You must enter a ${fieldName}.`;
+            if (value) return true;
+                return `You must enter a ${fieldName}.`;
         },
         async userRegister(){
             let userData = {
@@ -102,5 +102,7 @@ export default {
     position: fixed;
     place-items: center;
     z-index: 2;
+  }
+  .submitButton{
   }
 </style>
