@@ -3,6 +3,7 @@ from typing import TypedDict
 from datetime import datetime
 import logging
 from fastapi import HTTPException
+from fastapi.responses import JSONResponse
 
 from ..lib.Hash import HashFactory
 from ..lib.Database import UserDB,UserData
@@ -40,7 +41,7 @@ class UsernamePasswordUserProfile(User_profile):
             last_login_ip = client_ip
         )
         UserDB.insert_user(new_user)
-        return {"message": "User successfully registered", "user_name": register_request['user_name']}
+        return JSONResponse(content = {"message": "User successfully registered", "user_name": register_request['user_name']})
     
     #TODO: add login log and email check
     def login(self,login_request:LoginRequest,client_ip:str) -> str|bool:
@@ -51,7 +52,17 @@ class UsernamePasswordUserProfile(User_profile):
                 'user_name':login_request['user_name']
             }
             token = self.token_handler.encode(encode_data)
-            return  {"token": token}    
+            response = JSONResponse(content={"message": "Login success"})
+            response.set_cookie(
+                key="access_token",
+                value=token,
+                httponly=True,         
+                max_age=3600,         
+                expires=3600,
+                samesite="Lax",        
+                secure=True           
+            )
+            return  response 
         else:
             raise HTTPException(
                 status_code=400,
