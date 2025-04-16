@@ -2,7 +2,6 @@
 
 This project is designed to help me learn how to set up frontend-backend communication, handle database operations, and understand the registration and login processes. It includes a frontend, backend, and a database, all managed and started via Docker Compose.
 
-Note: This project is still under development, and currently, only the registration functionality is complete.
 
 ## Technology Stack
 * Frontend: Vue.js, Vite, Vuetify
