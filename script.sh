@@ -10,14 +10,14 @@ if [ ! -f "$ENV_FILE" ]; then
   FRONTEND_PORT=$((RANDOM % 10001 + 10000))
   HTTPS_PORT=$((RANDOM % 10001 + 10000))
   DATABASE_PORT=$((RANDOM % 10001 + 10000))
-  MYSQL_ROOT_PASSWORD=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 16)
-  TOKEN_SECRET_KEY=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 16)
+  MYSQL_ROOT_PASSWORD=$(openssl rand -base64 12 | tr -dc 'A-Za-z0-9' | head -c 16)
+  TOKEN_SECRET_KEY=$(openssl rand -base64 12 | tr -dc 'A-Za-z0-9' | head -c 16)
   NEW_ENV_CONTENT=$(echo "$ENV_SAMPLE_CONTENT" | \
         sed "s/BACKEND_PORT=[^ ]*/BACKEND_PORT=$BACKEND_PORT/" | \
         sed "s/FRONTEND_PORT=[^ ]*/FRONTEND_PORT=$FRONTEND_PORT/" | \
         sed "s/HTTPS_PORT=[^ ]*/HTTPS_PORT=$HTTPS_PORT/" | \
         sed "s/DATABASE_PORT=[^ ]*/DATABASE_PORT=$DATABASE_PORT/" | \
-        sed "s/MYSQL_ROOT_PASSWORD=[^ ]*/MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD/")
+        sed "s/MYSQL_ROOT_PASSWORD=[^ ]*/MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD/" | \
         sed "s/TOKEN_SECRET_KEY=[^ ]*/TOKEN_SECRET_KEY=$TOKEN_SECRET_KEY/")
   echo "$NEW_ENV_CONTENT" > "$ENV_FILE"
 fi
