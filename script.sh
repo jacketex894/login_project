@@ -30,6 +30,7 @@ export HTTPS_PORT=$HTTPS_PORT
 export DATABASE_PORT=$DATABASE_PORT
 export MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
 export MYSQL_PASSWORD=$MYSQL_ROOT_PASSWORD
+export TOKEN_SECRET_KEY=$TOKEN_SECRET_KEY
 #sql
 
 SQL_TEMPLATE_FILE="./mysql/my.cnf.template"
@@ -74,9 +75,12 @@ cd "$current_dir"
 BACKEND_TEMPLATE_FILE="./backend/login_backend/config_template.yaml"
 BACKEND_CONFIG_FILE="./backend/login_backend/config.yaml"
 
-envsubst < $BACKEND_TEMPLATE_FILE > $BACKEND_CONFIG_FILE
+sed -e "s/\${MYSQL_PASSWORD}/$MYSQL_PASSWORD/g" \
+    -e "s/\${DATABASE_PORT}/$DATABASE_PORT/g" \
+    -e "s/\${TOKEN_SECRET_KEY}/$TOKEN_SECRET_KEY/g" \
+    $BACKEND_TEMPLATE_FILE > $BACKEND_CONFIG_FILE
 
-docker compose up -d
+# docker compose up -d
 
 echo "Frontend run at http://localhost:$FRONTEND_PORT"
 echo "Backend run at http://localhost:$BACKEND_PORT"
