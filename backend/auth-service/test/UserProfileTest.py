@@ -5,8 +5,8 @@ from datetime import datetime
 from fastapi.responses import JSONResponse
 import json
 
-from ..util.UserProfile import UserProfileFactory,RegisterRequest,LoginRequest
-from ..lib.Database import UserDB
+from util.UserProfile import UserProfileFactory,RegisterRequest,LoginRequest
+from lib.Database import UserDB
 
 logging.getLogger().addHandler(logging.NullHandler())
 class TestUserProfile(unittest.TestCase):

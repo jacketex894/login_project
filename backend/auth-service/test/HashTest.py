@@ -1,7 +1,7 @@
 import unittest
 from argon2.exceptions import VerifyMismatchError
 
-from ..lib.Hash import HashFactory
+from lib.Hash import HashFactory
 
 class TestBcrypt(unittest.TestCase):
     def setUp(self):

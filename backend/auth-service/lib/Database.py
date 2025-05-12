@@ -6,7 +6,7 @@ from typing import TypedDict
 import logging
 from fastapi import HTTPException
 
-from ..config import Config
+from config.config import Config
 
 engine = create_engine(Config.USER_DATABASE_URL)
 Base = declarative_base()

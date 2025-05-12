@@ -5,9 +5,9 @@ import logging
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
-from ..lib.Hash import HashFactory
-from ..lib.Database import UserDB,UserData
-from ..lib.Token import Token,JWTToken
+from lib.Hash import HashFactory
+from lib.Database import UserDB,UserData
+from lib.Token import Token,JWTToken
 
 class RegisterRequest(TypedDict):
     user_name:str

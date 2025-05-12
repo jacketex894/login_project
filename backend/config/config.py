@@ -1,5 +1,5 @@
 import yaml
-with open('login_backend/config.yaml','r') as file:
+with open('config/config.yaml','r') as file:
     config = yaml.safe_load(file)
 
 class Config:

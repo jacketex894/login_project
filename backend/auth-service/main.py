@@ -2,7 +2,7 @@ from fastapi import FastAPI,Request
 from typing import TypedDict
 from typing import Union
 
-from .util.UserProfile import UserProfileFactory,RegisterRequest,LoginRequest
+from util.UserProfile import UserProfileFactory,RegisterRequest,LoginRequest
 app = FastAPI()
 
 class ErrorResponse(TypedDict):

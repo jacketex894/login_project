@@ -1,13 +1,14 @@
 services:
   backend:
-    build: ./backend    
+    build: ./backend/auth-service    
     env_file:
       - .env
     environment:
       - BACKEND_PORT=${BACKEND_PORT}
     volumes:
-      - ./backend/login_backend:/app/login_backend
-    container_name: login-backend
+      - ./backend/auth-service:/app/
+      - ./backend/config:/app/config
+    container_name: auth-service
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
     networks:

@@ -3,8 +3,8 @@ from datetime import datetime
 from fastapi import HTTPException
 import logging
 
-from ..lib.Database import UserDB,UserData
-from ..lib.Hash import HashFactory
+from lib.Database import UserDB,UserData
+from lib.Hash import HashFactory
 
 logging.getLogger().addHandler(logging.NullHandler())
 class TestUserDB(unittest.TestCase):

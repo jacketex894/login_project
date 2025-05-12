@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime
 
-from ..lib.Token import Token,JWTToken
+from lib.Token import Token,JWTToken
 
 class TestToken(unittest.TestCase):
     def setUp(self):

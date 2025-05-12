@@ -2,7 +2,7 @@ from abc import ABC,abstractmethod
 import jwt
 from datetime import datetime,timedelta
 
-from ..config import Config
+from config.config import Config
 class TokenStrategy(ABC):
     @abstractmethod
     def encode(self,data:dict) -> str:

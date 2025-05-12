@@ -31,49 +31,49 @@ export DATABASE_PORT=$DATABASE_PORT
 export MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
 export MYSQL_PASSWORD=$MYSQL_ROOT_PASSWORD
 export TOKEN_SECRET_KEY=$TOKEN_SECRET_KEY
-#sql
+# #sql
 
-SQL_TEMPLATE_FILE="./mysql/my.cnf.template"
-SQL_CONFIG_FILE="./mysql/my.cnf"
-envsubst < $SQL_TEMPLATE_FILE > $SQL_CONFIG_FILE
+# SQL_TEMPLATE_FILE="./mysql/my.cnf.template"
+# SQL_CONFIG_FILE="./mysql/my.cnf"
+# envsubst < $SQL_TEMPLATE_FILE > $SQL_CONFIG_FILE
 
-#cert
-if $CREATE_CERT; then
-  CERT_FOLDER="nginx/certs"
-  if [ ! -d "$CERT_FOLDER" ]; then
-    echo "Folder doesn't exist，creating：$CERT_FOLDER"
-    mkdir -p "$CERT_FOLDER"
-    openssl genpkey -algorithm RSA -out nginx/certs/server.key
-    openssl req -new -key nginx/certs/server.key -out nginx/certs/server.csr -config ssl.conf
-    openssl x509 -req -days 365 -in nginx/certs/server.csr -signkey nginx/certs/server.key -out nginx/certs/server.crt
-  else
-    echo "Folder exist：$CERT_FOLDER"
-  fi
-fi
+# #cert
+# if $CREATE_CERT; then
+#   CERT_FOLDER="nginx/certs"
+#   if [ ! -d "$CERT_FOLDER" ]; then
+#     echo "Folder doesn't exist，creating：$CERT_FOLDER"
+#     mkdir -p "$CERT_FOLDER"
+#     openssl genpkey -algorithm RSA -out nginx/certs/server.key
+#     openssl req -new -key nginx/certs/server.key -out nginx/certs/server.csr -config ssl.conf
+#     openssl x509 -req -days 365 -in nginx/certs/server.csr -signkey nginx/certs/server.key -out nginx/certs/server.crt
+#   else
+#     echo "Folder exist：$CERT_FOLDER"
+#   fi
+# fi
 
-#nginx
-NGINX_TEMPLATE_FILE="./nginx/nginx_template.conf"
-NGINX_CONFIG_FILE="./nginx/nginx.conf"
+# #nginx
+# NGINX_TEMPLATE_FILE="./nginx/nginx_template.conf"
+# NGINX_CONFIG_FILE="./nginx/nginx.conf"
 
-if [ -z "$FRONTEND_PORT" ]; then
-  echo "Error: FRONTEND_PORT not found in $ENV_FILE"
-  exit 1
-fi
+# if [ -z "$FRONTEND_PORT" ]; then
+#   echo "Error: FRONTEND_PORT not found in $ENV_FILE"
+#   exit 1
+# fi
 
-sed -e "s/\${FRONTEND_PORT}/$FRONTEND_PORT/g" \
-    -e "s/\${BACKEND_PORT}/$BACKEND_PORT/g" \
-    -e "s/\${HTTPS_PORT}/$HTTPS_PORT/g" \
-    $NGINX_TEMPLATE_FILE > $NGINX_CONFIG_FILE
+# sed -e "s/\${FRONTEND_PORT}/$FRONTEND_PORT/g" \
+#     -e "s/\${BACKEND_PORT}/$BACKEND_PORT/g" \
+#     -e "s/\${HTTPS_PORT}/$HTTPS_PORT/g" \
+#     $NGINX_TEMPLATE_FILE > $NGINX_CONFIG_FILE
 
-#frontend
-current_dir=$(pwd)
-cd frontend || exit
-npm run build
-cd "$current_dir"
+# #frontend
+# current_dir=$(pwd)
+# cd frontend || exit
+# npm run build
+# cd "$current_dir"
 
 #backend
-BACKEND_TEMPLATE_FILE="./backend/login_backend/config_template.yaml"
-BACKEND_CONFIG_FILE="./backend/login_backend/config.yaml"
+BACKEND_TEMPLATE_FILE="./backend/config/config_template.yaml"
+BACKEND_CONFIG_FILE="./backend/config/config.yaml"
 
 sed -e "s/\${MYSQL_PASSWORD}/$MYSQL_PASSWORD/g" \
     -e "s/\${DATABASE_PORT}/$DATABASE_PORT/g" \
