@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
 from lib.Hash import HashFactory
-from lib.Database import UserDB,UserData
+from lib.UserDatabase import UserDatabaseFactory,UserData
 from lib.Token import Token,JWTToken
 
 class RegisterRequest(TypedDict):
@@ -30,6 +30,8 @@ class UsernamePasswordUserProfile(User_profile):
     def __init__(self):
         self.hash_handler = HashFactory.get_hash_method("bcrypt")
         self.token_handler = Token(JWTToken())
+        database_factory = UserDatabaseFactory()
+        self.user_database = database_factory.get_database()
 
     def register(self,register_request:RegisterRequest,client_ip:str) -> dict:
         hash_password = self.hash_handler.hash_password(register_request['password'])
@@ -40,12 +42,12 @@ class UsernamePasswordUserProfile(User_profile):
             created_at = datetime.now(),
             last_login_ip = client_ip
         )
-        UserDB.insert_user(new_user)
+        self.user_database.create(new_user)
         return JSONResponse(content = {"message": "User successfully registered", "user_name": register_request['user_name']})
     
     #TODO: add login log and email check
     def login(self,login_request:LoginRequest,client_ip:str) -> str|bool:
-        retrieved_user = UserDB.query_user(login_request['user_name'])
+        retrieved_user = self.user_database.query(login_request['user_name'])
         valid = self.hash_handler.verify(login_request['password'],retrieved_user.hashed_password)
         if valid:
             encode_data = {
