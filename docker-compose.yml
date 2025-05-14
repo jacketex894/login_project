@@ -6,7 +6,6 @@ services:
     environment:
       - BACKEND_PORT=${BACKEND_PORT}
     volumes:
-      - ./backend/auth-service:/app/
       - ./backend/config:/app/config
     container_name: auth-service
     ports:

@@ -6,7 +6,7 @@ WORKDIR /app
 
 RUN apt-get update
 
-COPY . /app/
+COPY ./poetry.lock pyproject.toml /app/
 
 RUN poetry install 
 
