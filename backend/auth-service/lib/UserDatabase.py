@@ -87,7 +87,7 @@ class UserDatabase(DataBase):
             session.query(self.User).filter(self.User.user_name == user_name).first()
         )
         session.close()
-        return query_user
+        return query_user.all()
 
     def update(self, user_name: str, hashed_paaword: str, mail: str) -> None:
         # shouldn't store any password without hash
