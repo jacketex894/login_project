@@ -20,6 +20,9 @@ services:
       - EXPENSE_SERVICE_PORT=${EXPENSE_SERVICE_PORT}
     volumes:
       - ./backend/config:/app/config
+      - ./backend/expense-service/lib:/app/lib
+      - ./backend/expense-service/test:/app/test
+      - ./backend/expense-service/util:/app/util
     container_name: expense-service
     ports:
       - "${EXPENSE_SERVICE_PORT}:${EXPENSE_SERVICE_PORT}"

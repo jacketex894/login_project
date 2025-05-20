@@ -4,28 +4,17 @@ from sqlalchemy.ext.declarative import declarative_base
 import logging
 from fastapi import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
+from datetime import datetime
 
 from .Database import DataBase
 
+# TODO: add new database item
 """
 item
 
 id
 product_name
 quantity
-user_name
-"""
-
-"""
-expense
-
-id
-product_name
-quantity
-total_cost
-date
-category
-comment
 user_name
 """
 
@@ -57,12 +46,12 @@ class TransactionData(TypedDict):
     """
 
     user_id: int
-    category: String
-    product_name: String
-    quantity: int | None
+    category: str
+    product_name: str
+    quantity: int
     total_cost: int
-    pay_by: String | None
-    date: DateTime
+    pay_by: str
+    date: datetime
 
 
 class QueryTransactionData(TypedDict):
@@ -174,7 +163,7 @@ class TransactionDatabase(DataBase):
             session.rollback()
             logging.error("Error occurred while creating transaction record: %s", e)
             raise HTTPException(
-                status_code=500,
+                status_code=500, detail="Creating transaction error"
             ) from e
         finally:
             session.close()

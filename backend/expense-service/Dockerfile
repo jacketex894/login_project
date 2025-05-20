@@ -10,6 +10,9 @@ COPY ./poetry.lock pyproject.toml /app/
 
 RUN poetry install 
 
-COPY ./ /app/
+COPY ./lib /app/lib/
+COPY ./test /app/test/
+COPY ./util /app/util/
+COPY ./main.py /app/
 
 CMD ["sh", "-c", "poetry run uvicorn main:app --host 0.0.0.0 --port $EXPENSE_SERVICE_PORT --reload"]
