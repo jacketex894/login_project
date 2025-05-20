@@ -12,6 +12,22 @@ services:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
     networks:
       - app-network
+  expense-service:
+    build: ./backend/expense-service
+    env_file:
+      - .env
+    environment:
+      - EXPENSE_SERVICE_PORT=${EXPENSE_SERVICE_PORT}
+    volumes:
+      - ./backend/config:/app/config
+      - ./backend/expense-service/lib:/app/lib
+      - ./backend/expense-service/test:/app/test
+      - ./backend/expense-service/util:/app/util
+    container_name: expense-service
+    ports:
+      - "${EXPENSE_SERVICE_PORT}:${EXPENSE_SERVICE_PORT}"
+    networks:
+      - app-network
   nginx:
     build: ./nginx
     env_file:

@@ -13,4 +13,6 @@ RUN poetry install
 #set PATH for poetry
 ENV PATH="/root/.local/bin:${PATH}"
 
+COPY ./ /app/
+
 CMD ["sh", "-c", "poetry run uvicorn main:app --host 0.0.0.0 --port $BACKEND_PORT --reload"]
