@@ -6,7 +6,7 @@ from util.Transaction import create_transaction
 app = FastAPI()
 
 
-@app.post("/api/transaction", tags=["expense"])
+@app.post("/expense/transaction")
 def create_transaction_record(create_transaction_request: TransactionData) -> dict:
     """
     Create a new transaction record.

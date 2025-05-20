@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 
-import Login from '../views/Login.vue';
+import Login from '@/views/Login.vue';
 import Register from '@/views/Register.vue';
-
+import SpendingAnalysis from '@/views/SpendingAnalysis.vue';
 
 const routes = [
   {
@@ -15,6 +15,11 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: Register
+  },
+  {
+    path: '/spending-analysis',
+    name: 'SpendingAnalysis',
+    component: SpendingAnalysis
   }
 ];
 

@@ -60,7 +60,7 @@ export default {
                 this.showAlert = "true"
                 this.alertMessage = "Login sucess"
                 this.alertType = 'success'
-
+                router.push("/expense")
             }
             catch (error){
                 this.showAlert = "true"

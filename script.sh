@@ -65,6 +65,7 @@ fi
 sed -e "s/\${FRONTEND_PORT}/$FRONTEND_PORT/g" \
     -e "s/\${BACKEND_PORT}/$BACKEND_PORT/g" \
     -e "s/\${HTTPS_PORT}/$HTTPS_PORT/g" \
+    -e "s/\${EXPENSE_SERVICE_PORT}/$EXPENSE_SERVICE_PORT/g" \
     $NGINX_TEMPLATE_FILE > $NGINX_CONFIG_FILE
 
 #frontend
