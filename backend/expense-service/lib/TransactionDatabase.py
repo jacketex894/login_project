@@ -199,6 +199,7 @@ class TransactionDatabase(DataBase):
         session.close()
         return query.all()
 
+    # TODO: use exception report error not bool
     def update(self, transaction_id: int, update_data: TransactionData) -> bool:
         """
         Update the transaction record in the database that matches the given transaction_id.

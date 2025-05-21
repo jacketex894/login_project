@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
 from lib.Hash import HashFactory
-from lib.UserDatabase import UserDatabaseFactory, UserData
+from lib.UserDatabase import UserDatabase
 from lib.Token import Token, JWTToken
 
 
@@ -35,8 +35,7 @@ class UsernamePasswordUserProfile(User_profile):
     def __init__(self):
         self.hash_handler = HashFactory.get_hash_method("bcrypt")
         self.token_handler = Token(JWTToken())
-        database_factory = UserDatabaseFactory()
-        self.user_database = database_factory.get_database()
+        self.user_database = UserDatabase()
 
     def register(self, register_request: RegisterRequest, client_ip: str) -> dict:
         hash_password = self.hash_handler.hash_password(register_request["password"])
@@ -56,6 +55,7 @@ class UsernamePasswordUserProfile(User_profile):
         )
 
     # TODO: add login log and email check
+    # TODO: add table to record login history
     def login(self, login_request: LoginRequest, client_ip: str) -> str | bool:
         retrieved_user = self.user_database.query(login_request["user_name"])
         valid = self.hash_handler.verify(
