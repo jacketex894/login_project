@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from typing import TypedDict
 from typing import Union
 
-from util.UserProfile import UserProfileFactory, RegisterRequest, LoginRequest
+from util.UserProfile import UsernamePasswordUserProfile, RegisterRequest, LoginRequest
 
 app = FastAPI()
 
@@ -21,9 +21,19 @@ class ErrorResponse(TypedDict):
     },
 )
 def user_register(register_request: RegisterRequest, request: Request):
-    client_ip = request.client.host
-    user_profile_handler = UserProfileFactory.get_profile_handler("UsernamePassword")
-    return user_profile_handler.register(register_request, client_ip)
+    """
+    Register a new user.
+
+    Args:
+        register_request (RegisterRequest) : The user data to be registered.
+
+    Status code:
+        200 : User data register successfully.
+        400 : User data valid fail.
+        500 : Failed to register data (server problem).
+    """
+    user_profile_handler = UsernamePasswordUserProfile()
+    return user_profile_handler.register(register_request)
 
 
 @app.post(
@@ -34,7 +44,18 @@ def user_register(register_request: RegisterRequest, request: Request):
         400: {"model": ErrorResponse, "description": "User name or password wrong"}
     },
 )
-async def login(login_request: LoginRequest, request: Request):
+def login(login_request: LoginRequest, request: Request):
+    """
+    Login user with login information.
+
+    Args:
+        login_request (LoginRequest) : The user data to be registered.
+
+    Status code:
+        200 : User data register successfully.
+        400 : User data valid fail.
+        500 : Failed to register data (server problem).
+    """
     client_ip = request.client.host
-    user_profile_handler = UserProfileFactory.get_profile_handler("UsernamePassword")
+    user_profile_handler = UsernamePasswordUserProfile()
     return user_profile_handler.login(login_request, client_ip)

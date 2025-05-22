@@ -29,14 +29,3 @@ class JWTToken(TokenStrategy):
         return jwt.decode(
             token, Config.JWT_SECRET_KEY, algorithms=[Config.JWT_ALGORITHM]
         )
-
-
-class Token:
-    def __init__(self, token_method: TokenStrategy):
-        self.TokenHandler = token_method
-
-    def encode(self, data):
-        return self.TokenHandler.encode(data)
-
-    def decode(self, token):
-        return self.TokenHandler.decode(token)

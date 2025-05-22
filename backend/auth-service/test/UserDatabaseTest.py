@@ -10,6 +10,10 @@ logging.getLogger().addHandler(logging.NullHandler())
 
 
 class TestUserDB(unittest.TestCase):
+    """
+    Test case for interacting with the user database.
+    """
+
     def setUp(self):
         self.request_data: UserData = {
             "user_name": "test_user",
@@ -26,6 +30,9 @@ class TestUserDB(unittest.TestCase):
         }
 
     def test_CRUD(self):
+        """
+        Test the basic CRUD operations (Create, Read, Update, Delete) on the user database.
+        """
         user_database = UserDatabase()
 
         # insert

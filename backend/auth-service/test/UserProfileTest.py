@@ -5,13 +5,17 @@ from datetime import datetime
 from fastapi.responses import JSONResponse
 import json
 
-from util.UserProfile import UserProfileFactory, RegisterRequest, LoginRequest
-from lib.UserDatabase import UserDatabaseFactory
+from util.UserProfile import UsernamePasswordUserProfile, RegisterRequest, LoginRequest
+from lib.UserDatabase import UserDatabase
 
 logging.getLogger().addHandler(logging.NullHandler())
 
 
 class TestUserProfile(unittest.TestCase):
+    """
+    Test case for user register and login.
+    """
+
     def setUp(self):
         self.register_data: RegisterRequest = {
             "user_name": "test_user",
@@ -29,30 +33,32 @@ class TestUserProfile(unittest.TestCase):
         self.ip = "127.0.0.1"
 
     def tearDown(self):
-        database_factory = UserDatabaseFactory()
-        user_database = database_factory.get_database()
+        user_database = UserDatabase()
         delete_user = user_database.query(self.register_data["user_name"])
-        user_database.delete(delete_user)
+        user_database.delete(delete_user.user_id)
 
     def test_user_register(self):
-        user_profile_handler = UserProfileFactory.get_profile_handler(
-            "UsernamePassword"
-        )
-        response = user_profile_handler.register(self.register_data, self.ip)
+        """
+        Test user register and register with duplicate information.
+        """
+        user_profile_handler = UsernamePasswordUserProfile()
+        response = user_profile_handler.register(self.register_data)
         self.assertIsInstance(response, JSONResponse)
 
         body = json.loads(response.body.decode("utf-8"))
         self.assertEqual(body["message"], "User successfully registered")
         self.assertEqual(body["user_name"], self.register_data["user_name"])
+
         # Duplicate Registration
         with self.assertRaises(HTTPException):
-            user_profile_handler.register(self.register_data, self.ip)
+            user_profile_handler.register(self.register_data)
 
     def test_user_login(self):
-        user_profile_handler = UserProfileFactory.get_profile_handler(
-            "UsernamePassword"
-        )
-        user_profile_handler.register(self.register_data, self.ip)
+        """
+        Test user login and store JWT in cookie.
+        """
+        user_profile_handler = UsernamePasswordUserProfile()
+        user_profile_handler.register(self.register_data)
 
         response = user_profile_handler.login(self.login_data, self.ip)
         self.assertIsInstance(response, JSONResponse)
@@ -65,7 +71,9 @@ class TestUserProfile(unittest.TestCase):
         self.assertIn("Max-Age=3600", cookie_header)
         token = cookie_header.split("access_token=")[1].split(";")[0]
         decode_data = user_profile_handler.token_handler.decode(token)
-        self.assertEqual(decode_data["user_name"], self.login_data["user_name"])
+        user_database = UserDatabase()
+        retrieved_user = user_database.query(self.register_data["user_name"])
+        self.assertEqual(int(decode_data["sub"]), retrieved_user.user_id)
         self.assertIn("exp", decode_data)
         self.assertGreater(decode_data["exp"], datetime.now().timestamp())
 
