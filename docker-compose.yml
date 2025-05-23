@@ -7,6 +7,9 @@ services:
       - BACKEND_PORT=${BACKEND_PORT}
     volumes:
       - ./backend/config:/app/config
+      - ./backend/auth-service/lib:/app/lib
+      - ./backend/auth-service/test:/app/test
+      - ./backend/auth-service/util:/app/util
     container_name: auth-service
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"

@@ -5,11 +5,18 @@ from lib.Hash import HashFactory
 
 
 class TestBcrypt(unittest.TestCase):
+    """
+    Test case for hash with the user bctypt.
+    """
+
     def setUp(self):
         self.password = "test_password"
         self.hash_method = HashFactory.get_hash_method("bcrypt")
 
     def test_hash_password(self):
+        """
+        Test hash password
+        """
         hashed_password = self.hash_method.hash_password(self.password)
 
         self.assertIsInstance(hashed_password, str)
@@ -20,17 +27,27 @@ class TestBcrypt(unittest.TestCase):
         self.assertNotEqual(hashed_password, hashed_password_2)
 
     def test_verify_password_valid(self):
+        """
+        Test verify password
+        """
         hashed_password = self.hash_method.hash_password(self.password)
         self.assertTrue(self.hash_method.verify(self.password, hashed_password))
         self.assertFalse(self.hash_method.verify("wrong_password", hashed_password))
 
 
 class TestArgon2(unittest.TestCase):
+    """
+    Test case for hash with the user argon2.
+    """
+
     def setUp(self):
         self.password = "test_password"
         self.hash_method = HashFactory.get_hash_method("argon2")
 
     def test_hash_password(self):
+        """
+        Test hash password
+        """
         hashed_password = self.hash_method.hash_password(self.password)
 
         self.assertIsInstance(hashed_password, str)
@@ -41,6 +58,9 @@ class TestArgon2(unittest.TestCase):
         self.assertNotEqual(hashed_password, hashed_password_2)
 
     def test_verify_password_valid(self):
+        """
+        Test verify password
+        """
         hashed_password = self.hash_method.hash_password(self.password)
         self.assertTrue(self.hash_method.verify(self.password, hashed_password))
         with self.assertRaises(VerifyMismatchError):
