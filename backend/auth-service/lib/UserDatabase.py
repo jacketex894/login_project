@@ -6,8 +6,7 @@ from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException
 
-from core.config.config import Config
-from .Database import DataBase
+from core.Database import DataBase
 
 
 class UserData(TypedDict):
