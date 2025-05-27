@@ -6,7 +6,7 @@ from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException
 
-from config.config import Config
+from core.config.config import Config
 from .Database import DataBase
 
 

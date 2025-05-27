@@ -6,7 +6,7 @@ services:
     environment:
       - BACKEND_PORT=${BACKEND_PORT}
     volumes:
-      - ./backend/config:/app/config
+      - ./backend/core:/app/core
       - ./backend/auth-service/lib:/app/lib
       - ./backend/auth-service/test:/app/test
       - ./backend/auth-service/util:/app/util
@@ -22,7 +22,7 @@ services:
     environment:
       - EXPENSE_SERVICE_PORT=${EXPENSE_SERVICE_PORT}
     volumes:
-      - ./backend/config:/app/config
+      - ./backend/core:/app/core
       - ./backend/expense-service/lib:/app/lib
       - ./backend/expense-service/test:/app/test
       - ./backend/expense-service/util:/app/util

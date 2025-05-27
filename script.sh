@@ -75,8 +75,8 @@ npm run build
 cd "$current_dir"
 
 #backend
-BACKEND_TEMPLATE_FILE="./backend/config/config_template.yaml"
-BACKEND_CONFIG_FILE="./backend/config/config.yaml"
+BACKEND_TEMPLATE_FILE="./backend/core/config/config_template.yaml"
+BACKEND_CONFIG_FILE="./backend/core/config/config.yaml"
 
 sed -e "s/\${MYSQL_PASSWORD}/$MYSQL_PASSWORD/g" \
     -e "s/\${DATABASE_PORT}/$DATABASE_PORT/g" \

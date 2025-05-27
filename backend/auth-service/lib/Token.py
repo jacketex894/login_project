@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import jwt
 from datetime import datetime, timedelta
 
-from config.config import Config
+from core.config.config import Config
 
 
 class TokenStrategy(ABC):
