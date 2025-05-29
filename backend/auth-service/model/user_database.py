@@ -1,12 +1,24 @@
+import re
 from typing import TypedDict
 import logging
 from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import validates
 from sqlalchemy import Column, Integer, String, DateTime
-from sqlalchemy.exc import SQLAlchemyError
-from fastapi import HTTPException
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
-from core.Database import DataBase
+
+from core.database import DataBase
+from model.error import (
+    InvalidHashedPassword,
+    DatabaseCreateUserError,
+    UsernameAlreadyExistsError,
+    DatabaseQueryUserNotFoundError,
+    DatabaseUpdateUserNotFoundError,
+    DatabaseUpdateUserError,
+    DatabaseDeleteUserNotFoundError,
+    DatabaseDeleteUserError,
+)
 
 
 class UserData(TypedDict):
@@ -70,21 +82,25 @@ class UserDatabase(DataBase):
         mail = Column(String(255), unique=True, nullable=False)
         created_at = Column(DateTime, nullable=False)
 
-    def check_hash_password(self, hashed_password: str) -> bool:
-        """
-        Ensure the password is hashed before saving.
+        @validates("hashed_password")
+        def validate_hashed_password(self, _, value):
+            """
+            Validates that the password is already hashed using bcrypt.
 
-        Args:
-            hashed_password (str) : The user's password. Must be verified as hashed before storing in the database.
+            Args:
+                key (str): The column name being validated.
+                value (str): The password string to validate.
 
-        Returns:
-            bool: True if verify was successful, False otherwise.
-        """
-        if len(hashed_password) < 60:
-            logging.error("hashed_password %s is not hashed.", hashed_password)
-            raise HTTPException(
-                status_code=500,
-            )
+            Returns:
+                str: The valid hashed password.
+
+            Raises:
+                ValueError: If the password does not appear to be properly hashed.
+            """
+            # Check if it matches bcrypt hash pattern
+            if not re.fullmatch(r"^\$2[aby]\$.{56}$", value):
+                raise InvalidHashedPassword
+            return value
 
     def create(self, user_data: UserData) -> None:
         """
@@ -93,7 +109,6 @@ class UserDatabase(DataBase):
         Args:
             user_data (UserData) : The user data to be inserted.
         """
-        self.check_hash_password(user_data["hashed_password"])
         session = self.session()
         try:
             new_user = self.User(
@@ -104,12 +119,14 @@ class UserDatabase(DataBase):
             )
             session.add(new_user)
             session.commit()
+        except IntegrityError as e:
+            session.rollback()
+            logging.error("IntegrityError while creating user: %s", e)
+            raise UsernameAlreadyExistsError("Username already exists") from e
         except SQLAlchemyError as e:
             session.rollback()
             logging.error("Error occurred while creating user data: %s", e)
-            raise HTTPException(
-                status_code=500, detail="Creating user data error"
-            ) from e
+            raise DatabaseCreateUserError from e
         finally:
             session.close()
 
@@ -121,13 +138,15 @@ class UserDatabase(DataBase):
             user_name (str) : The user name used to filter user data.
 
         Returns:
-            list[Transaction]: A list of transaction records that match the conditions specified in `query_data`.
+            User: The user query with user name
         """
         session = self.session()
         retrieved_user = (
             session.query(self.User).filter(self.User.user_name == user_name).first()
         )
         session.close()
+        if not retrieved_user:
+            raise DatabaseQueryUserNotFoundError
         return retrieved_user
 
     def update(self, user_id: int, hashed_paaword: str, mail: str):
@@ -139,7 +158,6 @@ class UserDatabase(DataBase):
             hashed_paaword (str) : The hashed password used to update user data.
             mail(str) : The mail used to update user data.
         """
-        self.check_hash_password(hashed_paaword)
         session = self.session()
         try:
             update_user = (
@@ -153,11 +171,11 @@ class UserDatabase(DataBase):
                 logging.error(
                     "Error occurred while update user data: User doesn't exist"
                 )
-                raise HTTPException(status_code=500, detail="User doesn't exist")
+                raise DatabaseUpdateUserNotFoundError
         except SQLAlchemyError as e:
             session.rollback()
             logging.error("Error occurred while update user data: %s", e)
-            raise HTTPException(status_code=500, detail="Update user data error") from e
+            raise DatabaseUpdateUserError from e
         finally:
             session.close()
 
@@ -178,7 +196,7 @@ class UserDatabase(DataBase):
                 logging.error(
                     "Error occurred while delete user data: User doesn't exist"
                 )
-                raise HTTPException(status_code=500, detail="User doesn't exist")
+                raise DatabaseDeleteUserNotFoundError
         except SQLAlchemyError as e:
             session.rollback()
             logging.error(
@@ -186,8 +204,6 @@ class UserDatabase(DataBase):
                 user_id,
                 e,
             )
-            raise HTTPException(
-                status_code=500,
-            ) from e
+            raise DatabaseDeleteUserError from e
         finally:
             session.close()
