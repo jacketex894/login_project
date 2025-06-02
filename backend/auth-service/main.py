@@ -4,7 +4,14 @@ from typing import Union
 from fastapi.responses import JSONResponse
 from fastapi import HTTPException
 
-from model.error import HANDLED_ERRORS
+from model.error import (
+    BaseAPIException,
+    make_error_content,
+    InvalidHashedPassword,
+    DatabaseCreateUserError,
+    UsernameAlreadyExistsError,
+    InvalidUserNameOrPassword,
+)
 from controller.user_profile import (
     UsernamePasswordUserProfile,
     RegisterRequest,
@@ -16,18 +23,24 @@ app = FastAPI()
 
 class ErrorResponse(TypedDict):
     detail: str
-    code: int
+    error_code: int
 
 
-@app.put(
+@app.post(
     "/api/register",
     tags=["users"],
-    response_model=Union[dict, ErrorResponse],
+    response_model=dict,
     responses={
         500: {
             "model": ErrorResponse,
-            "description": "Invalid hashed password or Failed to create user",
-        }
+            "content": make_error_content(
+                [InvalidHashedPassword, DatabaseCreateUserError]
+            ),
+        },
+        400: {
+            "model": ErrorResponse,
+            "content": make_error_content([UsernameAlreadyExistsError]),
+        },
     },
 )
 def user_register(register_request: RegisterRequest, request: Request):
@@ -40,10 +53,12 @@ def user_register(register_request: RegisterRequest, request: Request):
     user_profile_handler = UsernamePasswordUserProfile()
     try:
         result = user_profile_handler.register(register_request)
-    except Exception as e:
-        status, msg = HANDLED_ERRORS[type(e)]
-        raise HTTPException(status_code=status, detail=msg) from e
-    return JSONResponse(content=result, status_code=200)
+        return JSONResponse(content=result, status_code=200)
+    except BaseAPIException as e:
+        error = e.to_dict()
+        raise HTTPException(
+            status_code=error["status_code"], detail=error["detail"]
+        ) from e
 
 
 @app.post(
@@ -51,7 +66,10 @@ def user_register(register_request: RegisterRequest, request: Request):
     tags=["users"],
     response_model=dict,
     responses={
-        400: {"model": ErrorResponse, "description": "Invalid username or password"}
+        400: {
+            "model": ErrorResponse,
+            "content": make_error_content([InvalidUserNameOrPassword]),
+        },
     },
 )
 def login(login_request: LoginRequest, request: Request):
@@ -76,6 +94,8 @@ def login(login_request: LoginRequest, request: Request):
             secure=True,
         )
         return response
-    except Exception as e:
-        status, msg = HANDLED_ERRORS[type(e)]
-        raise HTTPException(status_code=status, detail=msg) from e
+    except BaseAPIException as e:
+        error = InvalidUserNameOrPassword().to_dict()
+        raise HTTPException(
+            status_code=error["status_code"], detail=error["detail"]
+        ) from e

@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 
-from core.Database import DataBase
+from core.database import DataBase
 
 # TODO: add new database item
 """
