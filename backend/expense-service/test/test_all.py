@@ -36,7 +36,7 @@ def run_all_tests():
 
     logger.info("Start search and test %s all test case", test_dir)
 
-    suite = loader.discover(start_dir=test_dir, pattern="*Test.py")
+    suite = loader.discover(start_dir=test_dir, pattern="*test.py")
 
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
