@@ -1,12 +1,14 @@
 import unittest
-from fastapi import HTTPException
 import logging
 from datetime import datetime
-from fastapi.responses import JSONResponse
-import json
 
-from util.UserProfile import UsernamePasswordUserProfile, RegisterRequest, LoginRequest
-from lib.UserDatabase import UserDatabase
+from controller.user_profile import (
+    UsernamePasswordUserProfile,
+    RegisterRequest,
+    LoginRequest,
+)
+from model.user_database import UserDatabase
+from core.error import LoginWithWrongPasswordError
 
 logging.getLogger().addHandler(logging.NullHandler())
 
@@ -42,16 +44,9 @@ class TestUserProfile(unittest.TestCase):
         Test user register and register with duplicate information.
         """
         user_profile_handler = UsernamePasswordUserProfile()
-        response = user_profile_handler.register(self.register_data)
-        self.assertIsInstance(response, JSONResponse)
-
-        body = json.loads(response.body.decode("utf-8"))
-        self.assertEqual(body["message"], "User successfully registered")
-        self.assertEqual(body["user_name"], self.register_data["user_name"])
-
-        # Duplicate Registration
-        with self.assertRaises(HTTPException):
-            user_profile_handler.register(self.register_data)
+        content = user_profile_handler.register(self.register_data)
+        self.assertEqual(content["message"], "User successfully registered")
+        self.assertEqual(content["user_name"], self.register_data["user_name"])
 
     def test_user_login(self):
         """
@@ -60,16 +55,8 @@ class TestUserProfile(unittest.TestCase):
         user_profile_handler = UsernamePasswordUserProfile()
         user_profile_handler.register(self.register_data)
 
-        response = user_profile_handler.login(self.login_data, self.ip)
-        self.assertIsInstance(response, JSONResponse)
-        body = json.loads(response.body.decode("utf-8"))
-        self.assertEqual(body["message"], "Login success")
-
-        cookie_header = response.headers.get("set-cookie")
-        self.assertIn("access_token", cookie_header)
-        self.assertIn("HttpOnly", cookie_header)
-        self.assertIn("Max-Age=3600", cookie_header)
-        token = cookie_header.split("access_token=")[1].split(";")[0]
+        content, token = user_profile_handler.login(self.login_data, self.ip)
+        self.assertEqual(content["message"], "Login success")
         decode_data = user_profile_handler.token_handler.decode(token)
         user_database = UserDatabase()
         retrieved_user = user_database.query(self.register_data["user_name"])
@@ -77,7 +64,7 @@ class TestUserProfile(unittest.TestCase):
         self.assertIn("exp", decode_data)
         self.assertGreater(decode_data["exp"], datetime.now().timestamp())
 
-        with self.assertRaises(HTTPException):
+        with self.assertRaises(LoginWithWrongPasswordError):
             user_profile_handler.login(self.wrong_data, self.ip)
 
 

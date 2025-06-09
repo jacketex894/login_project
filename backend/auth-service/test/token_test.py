@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime
 
-from lib.Token import JWTToken
+from core.token import JWTToken
 
 
 class TestToken(unittest.TestCase):

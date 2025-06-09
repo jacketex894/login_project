@@ -17,7 +17,7 @@ export function login(userData){
 
 export function register(userData){
     return fetch(`${BASE_URL}/register`,{
-        method:'PUT',
+        method:'POST',
         headers:{
             'Content-Type':'application/json',
         },

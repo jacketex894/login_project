@@ -4,9 +4,10 @@ from datetime import datetime
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
-from lib.Hash import HashFactory
-from lib.UserDatabase import UserDatabase, UserData
-from lib.Token import JWTToken
+from model.hash import HashBcrypt
+from model.user_database import UserDatabase, UserData
+from core.token import JWTToken
+from core.error import LoginWithWrongPasswordError
 
 
 class RegisterRequest(TypedDict):
@@ -64,7 +65,7 @@ class UsernamePasswordUserProfile(UserProfile):
     """
 
     def __init__(self):
-        self.hash_handler = HashFactory.get_hash_method("bcrypt")
+        self.hash_handler = HashBcrypt()
         self.token_handler = JWTToken()
         self.user_database = UserDatabase()
 
@@ -78,7 +79,9 @@ class UsernamePasswordUserProfile(UserProfile):
         Returns:
             dict: success message and user name
         """
+        # TODO: add check account exist
         hash_password = self.hash_handler.hash_password(register_request["password"])
+
         new_user = UserData(
             user_name=register_request["user_name"],
             hashed_password=hash_password,
@@ -86,16 +89,14 @@ class UsernamePasswordUserProfile(UserProfile):
             created_at=datetime.now(),
         )
         self.user_database.create(new_user)
-        return JSONResponse(
-            content={
-                "message": "User successfully registered",
-                "user_name": register_request["user_name"],
-            }
-        )
+        return {
+            "message": "User successfully registered",
+            "user_name": register_request["user_name"],
+        }
 
     # TODO: add login log and email check
     # TODO: add table to record login history
-    def login(self, login_request: LoginRequest, client_ip: str) -> str | bool:
+    def login(self, login_request: LoginRequest, client_ip: str) -> tuple[dict, str]:
         """
         This function provide login with user name and password.
         After succes login , probide jwt in cookie.
@@ -104,27 +105,17 @@ class UsernamePasswordUserProfile(UserProfile):
             login_request(LoginRequest): The user information for login.
 
         Returns:
-            dict: success message
+            dict : success message
+            str : token
         """
         retrieved_user = self.user_database.query(login_request["user_name"])
         valid = self.hash_handler.verify(
             login_request["password"], retrieved_user.hashed_password
         )
-        if valid:
-            encode_data = {"sub": str(retrieved_user.user_id)}
-            token = self.token_handler.encode(encode_data)
-            response = JSONResponse(content={"message": "Login success"})
-            response.set_cookie(
-                key="access_token",
-                value=token,
-                httponly=True,
-                max_age=3600,
-                expires=3600,
-                samesite="Strict",
-                secure=True,
-            )
-            return response
-        else:
-            raise HTTPException(
-                status_code=400,
-            )
+        if not valid:
+            raise LoginWithWrongPasswordError
+        encode_data = {"sub": str(retrieved_user.user_id)}
+        token = self.token_handler.encode(encode_data)
+
+        content = {"message": "Login success"}
+        return content, token
