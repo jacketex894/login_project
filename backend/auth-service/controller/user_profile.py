@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from model.hash import HashBcrypt
 from model.user_database import UserDatabase, UserData
 from core.token import JWTToken
-from model.error import LoginWithWrongPasswordError
+from core.error import LoginWithWrongPasswordError
 
 
 class RegisterRequest(TypedDict):

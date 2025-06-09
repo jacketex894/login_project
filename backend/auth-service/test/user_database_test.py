@@ -7,10 +7,11 @@ from sqlalchemy.exc import IntegrityError
 
 from model.user_database import UserDatabase, UserData
 from model.hash import HashBcrypt
-from model.error import (
+from core.error import (
     InvalidHashedPassword,
     DatabaseCreateUserError,
     UsernameAlreadyExistsError,
+    DatabaseQueryUserError,
     DatabaseQueryUserNotFoundError,
     DatabaseUpdateUserNotFoundError,
     DatabaseUpdateUserError,
@@ -61,7 +62,7 @@ class TestUserDB(unittest.TestCase):
             mock_session.commit.assert_called_once()
             mock_session.close.assert_called_once()
 
-    def test_create_failure(self):
+    def test_create_user_failure(self):
         """Test that a valid user is created fail in the database."""
         mock_session = MagicMock()
         mock_user = MagicMock()
@@ -77,7 +78,7 @@ class TestUserDB(unittest.TestCase):
             mock_session.rollback.assert_called_once()
             mock_session.close.assert_called_once()
 
-    def test_create_duplicate(self):
+    def test_create_user_duplicate(self):
         """Test that a valid user is already created in the database."""
         mock_session = MagicMock()
         mock_user = MagicMock()
@@ -99,7 +100,7 @@ class TestUserDB(unittest.TestCase):
             mock_session.rollback.assert_called_once()
             mock_session.close.assert_called_once()
 
-    def test_query_success(self):
+    def test_query_user_success(self):
         """Test that querying a user by user_name returns the correct user."""
         mock_session = MagicMock()
         mock_user = MagicMock()
@@ -120,7 +121,7 @@ class TestUserDB(unittest.TestCase):
             mock_filter.first.assert_called_once()
             mock_session.close.assert_called_once()
 
-    def test_query_not_found(self):
+    def test_query_user_not_found(self):
         """Test that querying a user not in the database raises exception."""
         mock_session = MagicMock()
 
@@ -139,7 +140,26 @@ class TestUserDB(unittest.TestCase):
             mock_filter.first.assert_called_once()
             mock_session.close.assert_called_once()
 
-    def test_update_success(self):
+    def test_query_user_user_fail(self):
+        """Test that querying a user fail."""
+        mock_session = MagicMock()
+
+        mock_query = mock_session.query.return_value
+        mock_filter = mock_query.filter.return_value
+        mock_filter.first.side_effect = SQLAlchemyError("DB Error")
+
+        with patch(
+            "model.user_database.UserDatabase.User", new_callable=MagicMock
+        ), patch.object(self.user_database, "session", return_value=mock_session):
+            with self.assertRaises(DatabaseQueryUserError):
+                self.user_database.query("test_user")
+
+            mock_session.query.assert_called_once_with(self.user_database.User)
+            mock_query.filter.assert_called_once()
+            mock_filter.first.assert_called_once()
+            mock_session.close.assert_called_once()
+
+    def test_update_user_success(self):
         """Test that updating an existing user succeeds."""
         mock_session = MagicMock()
         mock_user = MagicMock()
@@ -189,7 +209,7 @@ class TestUserDB(unittest.TestCase):
 
             mock_session.close.assert_called_once()
 
-    def test_update_failure(self):
+    def test_update_user_failure(self):
         """Test that a SQLAlchemyError during commit raises DatabaseUpdateUserError."""
         mock_session = MagicMock()
         mock_user = MagicMock()
@@ -215,7 +235,7 @@ class TestUserDB(unittest.TestCase):
             mock_session.rollback.assert_called_once()
             mock_session.close.assert_called_once()
 
-    def test_delete_success(self):
+    def test_delete_user_success(self):
         """Test that deleting an existing user succeeds."""
         mock_session = MagicMock()
         mock_user = MagicMock()
@@ -253,7 +273,7 @@ class TestUserDB(unittest.TestCase):
 
             mock_session.close.assert_called_once()
 
-    def test_delete_failure(self):
+    def test_delete_user_failure(self):
         """Test that SQLAlchemyError during commit raises DatabaseDeleteUserError."""
         mock_session = MagicMock()
         mock_user = MagicMock()
@@ -300,8 +320,8 @@ class TestUserDB(unittest.TestCase):
 
         # delete
         self.user_database.delete(retrieved_user.user_id)
-        with self.assertRaises(DatabaseQueryUserNotFoundError):
-            self.user_database.query(self.user_data["user_name"])
+        with self.assertRaises(DatabaseDeleteUserNotFoundError):
+            self.user_database.delete(self.user_data["user_name"])
 
 
 if __name__ == "__main__":

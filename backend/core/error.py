@@ -1,13 +1,32 @@
 from fastapi import status
+from typing import TypedDict
 
 
 class BaseAPIException(Exception):
+    """
+    Base exception class for errors.
+
+    Attributes:
+        error_name : str
+            A string representing the name/type of the error.
+        status_code : int
+            The associated HTTP status code (e.g., 400, 404, 500).
+        detail : str
+            A detailed description of the error, useful for clients.
+        error_code : int
+            An application-specific error code to help identify
+            the exact error type programmatically.
+    """
+
     error_name: str
     status_code: int
     detail: str
     error_code: int
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
+        """
+        Convert the exception attributes to a dictionary.
+        """
         return {
             "error_name": self.error_name,
             "status_code": self.status_code,
@@ -16,6 +35,7 @@ class BaseAPIException(Exception):
         }
 
 
+# Server error 5XX
 class InvalidHashedPassword(BaseAPIException):
     """Raised when the password does not appear to be properly hashed."""
 
@@ -34,13 +54,22 @@ class DatabaseCreateUserError(BaseAPIException):
     error_code = 5002
 
 
+class DatabaseQueryUserError(BaseAPIException):
+    """Raised when the query user fail."""
+
+    error_name = "DatabaseQueryUserError"
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    detail = "Failed to query user"
+    error_code = 5003
+
+
 class DatabaseUpdateUserError(BaseAPIException):
     """Raised when the update user fail."""
 
     error_name = "DatabaseUpdateUserError"
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     detail = "Failed to update user"
-    error_code = 5003
+    error_code = 5004
 
 
 class DatabaseDeleteUserError(BaseAPIException):
@@ -49,9 +78,46 @@ class DatabaseDeleteUserError(BaseAPIException):
     error_name = "DatabaseDeleteUserError"
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     detail = "Failed to delete user"
-    error_code = 5004
+    error_code = 5005
 
 
+class DatabaseCreateTransactionError(BaseAPIException):
+    """Raised when the create transaction error."""
+
+    error_name = "DatabaseCreateTransactionError"
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    detail = "Failed to create transaction"
+    error_code = 5006
+
+
+class DatabaseQueryTransactionError(BaseAPIException):
+    """Raised when the query transaction error."""
+
+    error_name = "DatabaseQueryTransactionError"
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    detail = "Failed to query transaction"
+    error_code = 5007
+
+
+class DatabaseUpdateTransactionError(BaseAPIException):
+    """Raised when the update transaction error."""
+
+    error_name = "DatabaseUpdateTransactionError"
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    detail = "Failed to update transaction"
+    error_code = 5008
+
+
+class DatabaseDeleteTransactionError(BaseAPIException):
+    """Raised when the delete transaction error."""
+
+    error_name = "DatabaseDeleteTransactionError"
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    detail = "Failed to delete transaction"
+    error_code = 5009
+
+
+# User error 4XX
 class UsernameAlreadyExistsError(BaseAPIException):
     """Raised when the create user name exist."""
 
@@ -106,7 +172,35 @@ class InvalidUserNameOrPassword(BaseAPIException):
     error_code = 4006
 
 
+class DatabaseUpdateTransactionNotFoundError(BaseAPIException):
+    """Raised when the update transaction not found."""
+
+    error_name = "DatabaseUpdateTransactionNotFoundError"
+    status_code = status.HTTP_404_NOT_FOUND
+    detail = "Transaction to update not found"
+    error_code = 4007
+
+
+class DatabaseDeleteTransactionNotFoundError(BaseAPIException):
+    """Raised when the update transaction not found."""
+
+    error_name = "DatabaseUpdateTransactionNotFoundError"
+    status_code = status.HTTP_404_NOT_FOUND
+    detail = "Transaction to delete not found"
+    error_code = 4008
+
+
+class ErrorResponse(TypedDict):
+    """error response for api"""
+
+    detail: str
+    error_code: int
+
+
 def make_error_content(error_types: list[BaseAPIException]):
+    """
+    Output a content for api doc.
+    """
     content = {"application/json": {"example": {}}}
     errors_as_dicts = [cls().to_dict() for cls in error_types]
     for error in errors_as_dicts:

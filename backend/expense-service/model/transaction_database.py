@@ -5,8 +5,17 @@ import logging
 from fastapi import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
+from typing import List
 
 from core.database import DataBase
+from core.error import (
+    DatabaseCreateTransactionError,
+    DatabaseQueryTransactionError,
+    DatabaseUpdateTransactionNotFoundError,
+    DatabaseUpdateTransactionError,
+    DatabaseDeleteTransactionNotFoundError,
+    DatabaseDeleteTransactionError,
+)
 
 # TODO: add new database item
 """
@@ -162,13 +171,11 @@ class TransactionDatabase(DataBase):
         except SQLAlchemyError as e:
             session.rollback()
             logging.error("Error occurred while creating transaction record: %s", e)
-            raise HTTPException(
-                status_code=500, detail="Creating transaction error"
-            ) from e
+            raise DatabaseCreateTransactionError from e
         finally:
             session.close()
 
-    def query(self, query_data: TransactionData) -> list[Transaction]:
+    def query(self, query_data: TransactionData) -> List[Transaction]:
         """
         Query transaction records from the database that match the given conditions.
 
@@ -179,27 +186,34 @@ class TransactionDatabase(DataBase):
             list[Transaction]: A list of transaction records that match the conditions specified in `query_data`.
         """
         session = self.session()
-        query = session.query(self.Transaction)
-        if query_data["user_id"] is not None:
-            query = query.filter(self.Transaction.user_id == query_data["user_id"])
+        try:
+            query = session.query(self.Transaction)
+            if query_data["user_id"] is not None:
+                query = query.filter(self.Transaction.user_id == query_data["user_id"])
 
-        if query_data["category"] is not None:
-            query = query.filter(self.Transaction.category == query_data["category"])
+            if query_data["category"] is not None:
+                query = query.filter(
+                    self.Transaction.category == query_data["category"]
+                )
 
-        if query_data["product_name"] is not None:
-            query = query.filter(
-                self.Transaction.product_name == query_data["product_name"]
-            )
+            if query_data["product_name"] is not None:
+                query = query.filter(
+                    self.Transaction.product_name == query_data["product_name"]
+                )
 
-        if query_data["pay_by"] is not None:
-            query = query.filter(self.Transaction.pay_by == query_data["pay_by"])
+            if query_data["pay_by"] is not None:
+                query = query.filter(self.Transaction.pay_by == query_data["pay_by"])
 
-        if query_data["date"] is not None:
-            query = query.filter(self.Transaction.date == query_data["date"])
-        session.close()
-        return query.all()
+            if query_data["date"] is not None:
+                query = query.filter(self.Transaction.date == query_data["date"])
+            return query.all()
+        except SQLAlchemyError as e:
+            session.rollback()
+            logging.error("Error occurred while query transaction record: %s", e)
+            raise DatabaseQueryTransactionError from e
+        finally:
+            session.close()
 
-    # TODO: use exception report error not bool
     def update(self, transaction_id: int, update_data: TransactionData) -> bool:
         """
         Update the transaction record in the database that matches the given transaction_id.
@@ -207,11 +221,8 @@ class TransactionDatabase(DataBase):
         Args:
             transaction_id (int) : The ID used to filter transaction records.
             update_data (TransactionData): The data used to update transaction record.
-
-        Returns:
-            bool: True if update was successful, False otherwise.
         """
-        success_flag = True
+
         session = self.session()
         query = session.query(self.Transaction)
         try:
@@ -227,17 +238,14 @@ class TransactionDatabase(DataBase):
                 update_record.pay_by = update_data["pay_by"]
                 update_record.date = update_data["date"]
             else:
-                success_flag = False
+                raise DatabaseUpdateTransactionNotFoundError
             session.commit()
         except SQLAlchemyError as e:
             session.rollback()
             logging.error("Error occurred while updating transaction record: %s", e)
-            raise HTTPException(
-                status_code=500,
-            ) from e
+            raise DatabaseUpdateTransactionError from e
         finally:
             session.close()
-        return success_flag
 
     def delete(self, transaction_id: int) -> bool:
         """
@@ -245,11 +253,7 @@ class TransactionDatabase(DataBase):
 
         Args:
             transaction_id (int) : The ID used to filter transaction records.
-
-        Returns:
-            bool: True if delete was successful, False otherwise.
         """
-        success_flag = True
         session = self.session()
         try:
             transaction = (
@@ -261,7 +265,7 @@ class TransactionDatabase(DataBase):
                 session.delete(transaction)
                 session.commit()
             else:
-                success_flag = False
+                raise DatabaseDeleteTransactionNotFoundError
 
         except SQLAlchemyError as e:
             session.rollback()
@@ -270,9 +274,6 @@ class TransactionDatabase(DataBase):
                 transaction_id,
                 e,
             )
-            raise HTTPException(
-                status_code=500,
-            ) from e
+            raise DatabaseDeleteTransactionError from e
         finally:
             session.close()
-        return success_flag

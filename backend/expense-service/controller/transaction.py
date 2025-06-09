@@ -1,4 +1,4 @@
-from lib.TransactionDatabase import TransactionData, TransactionDatabase
+from model.transaction_database import TransactionData, TransactionDatabase
 
 
 def create_transaction(transaction_data: TransactionData) -> None:
@@ -7,10 +7,6 @@ def create_transaction(transaction_data: TransactionData) -> None:
 
     Args:
         transaction_data (TransactionData) : The transaction data to be inserted.
-
-    Status code:
-        200 : Transaction record create successfully.
-        500 : Failed to create transaction record.
     """
     transaction_database = TransactionDatabase()
     transaction_database.create(transaction_data)

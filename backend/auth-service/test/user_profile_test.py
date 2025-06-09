@@ -8,7 +8,7 @@ from controller.user_profile import (
     LoginRequest,
 )
 from model.user_database import UserDatabase
-from model.error import LoginWithWrongPasswordError
+from core.error import LoginWithWrongPasswordError
 
 logging.getLogger().addHandler(logging.NullHandler())
 

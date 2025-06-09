@@ -8,6 +8,7 @@ services:
     volumes:
       - ./backend/core:/app/core
       - ./backend/auth-service/model:/app/model
+      - ./backend/auth-service/router:/app/router
       - ./backend/auth-service/test:/app/test
       - ./backend/auth-service/controller:/app/controller
     container_name: auth-service
@@ -23,9 +24,10 @@ services:
       - EXPENSE_SERVICE_PORT=${EXPENSE_SERVICE_PORT}
     volumes:
       - ./backend/core:/app/core
-      - ./backend/expense-service/lib:/app/lib
+      - ./backend/expense-service/model:/app/model
+      - ./backend/expense-service/router:/app/router
       - ./backend/expense-service/test:/app/test
-      - ./backend/expense-service/util:/app/util
+      - ./backend/expense-service/controller:/app/controller
     container_name: expense-service
     ports:
       - "${EXPENSE_SERVICE_PORT}:${EXPENSE_SERVICE_PORT}"

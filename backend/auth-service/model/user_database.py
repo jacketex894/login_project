@@ -9,10 +9,11 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 
 from core.database import DataBase
-from model.error import (
+from core.error import (
     InvalidHashedPassword,
     DatabaseCreateUserError,
     UsernameAlreadyExistsError,
+    DatabaseQueryUserError,
     DatabaseQueryUserNotFoundError,
     DatabaseUpdateUserNotFoundError,
     DatabaseUpdateUserError,
@@ -141,13 +142,21 @@ class UserDatabase(DataBase):
             User: The user query with user name
         """
         session = self.session()
-        retrieved_user = (
-            session.query(self.User).filter(self.User.user_name == user_name).first()
-        )
-        session.close()
-        if not retrieved_user:
-            raise DatabaseQueryUserNotFoundError
-        return retrieved_user
+        try:
+            retrieved_user = (
+                session.query(self.User)
+                .filter(self.User.user_name == user_name)
+                .first()
+            )
+            if not retrieved_user:
+                raise DatabaseQueryUserNotFoundError
+            return retrieved_user
+        except SQLAlchemyError as e:
+            session.rollback()
+            logging.error("Error occurred while query transaction record: %s", e)
+            raise DatabaseQueryUserError from e
+        finally:
+            session.close()
 
     def update(self, user_id: int, hashed_paaword: str, mail: str):
         """
