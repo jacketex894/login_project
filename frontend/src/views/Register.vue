@@ -65,7 +65,7 @@ export default {
                 this.showAlert = "true"
                 this.alertMessage = "Register sucess"
                 this.alertType = 'success'
-
+                this.$router.push("/")
             }
             catch (error){
                 this.showAlert = "true"
