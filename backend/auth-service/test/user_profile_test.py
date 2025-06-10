@@ -1,6 +1,7 @@
 import unittest
 import logging
 from datetime import datetime
+from unittest.mock import MagicMock, Mock
 
 from controller.user_profile import (
     UsernamePasswordUserProfile,
@@ -54,15 +55,19 @@ class TestUserProfile(unittest.TestCase):
         """
         user_profile_handler = UsernamePasswordUserProfile()
         user_profile_handler.register(self.register_data)
-
         content, token = user_profile_handler.login(self.login_data, self.ip)
+
+        mock_request = Mock()
+        mock_request.cookies = MagicMock(spec=dict)
+        mock_request.cookies.get.return_value = token
+
         self.assertEqual(content["message"], "Login success")
-        decode_data = user_profile_handler.token_handler.decode(token)
+        user_id = user_profile_handler.token_handler.get_current_user_from_cookie(
+            mock_request
+        )
         user_database = UserDatabase()
         retrieved_user = user_database.query(self.register_data["user_name"])
-        self.assertEqual(int(decode_data["sub"]), retrieved_user.user_id)
-        self.assertIn("exp", decode_data)
-        self.assertGreater(decode_data["exp"], datetime.now().timestamp())
+        self.assertEqual(user_id, retrieved_user.user_id)
 
         with self.assertRaises(LoginWithWrongPasswordError):
             user_profile_handler.login(self.wrong_data, self.ip)

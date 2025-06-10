@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 
 from model.hash import HashBcrypt
 from model.user_database import UserDatabase, UserData
-from core.token import JWTToken
+from core.token import JWTToken, TokenService
 from core.error import LoginWithWrongPasswordError
 
 
@@ -66,7 +66,7 @@ class UsernamePasswordUserProfile(UserProfile):
 
     def __init__(self):
         self.hash_handler = HashBcrypt()
-        self.token_handler = JWTToken()
+        self.token_handler = TokenService(JWTToken)
         self.user_database = UserDatabase()
 
     def register(self, register_request: RegisterRequest) -> dict:
@@ -115,7 +115,7 @@ class UsernamePasswordUserProfile(UserProfile):
         if not valid:
             raise LoginWithWrongPasswordError
         encode_data = {"sub": str(retrieved_user.user_id)}
-        token = self.token_handler.encode(encode_data)
+        token = self.token_handler.generate_token(encode_data)
 
         content = {"message": "Login success"}
         return content, token

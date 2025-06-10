@@ -190,6 +190,42 @@ class DatabaseDeleteTransactionNotFoundError(BaseAPIException):
     error_code = 4008
 
 
+class AccessTokenNotFound(BaseAPIException):
+    """Exception raised when the access token is missing from the request."""
+
+    error_name = "AccessTokenNotFound"
+    status_code = status.HTTP_404_NOT_FOUND
+    detail = "Access token not found from the request"
+    error_code = 4009
+
+
+class AccessTokenUserIDNotFound(BaseAPIException):
+    """Exception raised when the decoded access token does not contain a user ID."""
+
+    error_name = "AccessTokenUserIDNotFound"
+    status_code = status.HTTP_404_NOT_FOUND
+    detail = "Access token does not contain a user ID"
+    error_code = 4010
+
+
+class AccessTokenExpired(BaseAPIException):
+    """Exception raised when the access token has expired."""
+
+    error_name = "AccessTokenExpired"
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = "Access token has expired"
+    error_code = 4011
+
+
+class AccessTokenInvalid(BaseAPIException):
+    """Exception raised when the access token is invalid or cannot be decoded."""
+
+    error_name = "AccessTokenInvalid"
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = "Access token is invalid"
+    error_code = 4012
+
+
 class ErrorResponse(TypedDict):
     """error response for api"""
 
