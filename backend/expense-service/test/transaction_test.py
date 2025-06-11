@@ -36,7 +36,7 @@ class TestTransaction(unittest.TestCase):
         """
         Test the creation of a new transaction.
         """
-        create_transaction(self.transaction_data)
+        create_transaction(0, self.transaction_data)
         transction_database = TransactionDatabase()
         retrieved_data = transction_database.query(self.query_data)
         self.assertIsNotNone(retrieved_data, "retrieved data should not be None")
