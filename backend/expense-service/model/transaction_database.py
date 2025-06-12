@@ -148,6 +148,9 @@ class TransactionDatabase(DataBase):
         pay_by = Column(String(255), nullable=False, default="cash")
         date = Column(DateTime, nullable=False)
 
+        def to_dict(self):
+            return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
     def create(self, transaction_data: TransactionData):
         """
         Insert a transaction record into the database.
@@ -188,23 +191,23 @@ class TransactionDatabase(DataBase):
         session = self.session()
         try:
             query = session.query(self.Transaction)
-            if query_data["user_id"] is not None:
+            if query_data.get("user_id") is not None:
                 query = query.filter(self.Transaction.user_id == query_data["user_id"])
 
-            if query_data["category"] is not None:
+            if query_data.get("category") is not None:
                 query = query.filter(
                     self.Transaction.category == query_data["category"]
                 )
 
-            if query_data["product_name"] is not None:
+            if query_data.get("product_name") is not None:
                 query = query.filter(
                     self.Transaction.product_name == query_data["product_name"]
                 )
 
-            if query_data["pay_by"] is not None:
+            if query_data.get("pay_by") is not None:
                 query = query.filter(self.Transaction.pay_by == query_data["pay_by"])
 
-            if query_data["date"] is not None:
+            if query_data.get("date") is not None:
                 query = query.filter(self.Transaction.date == query_data["date"])
             return query.all()
         except SQLAlchemyError as e:

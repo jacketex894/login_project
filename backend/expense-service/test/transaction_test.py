@@ -1,12 +1,13 @@
 import unittest
 from datetime import datetime
+from unittest.mock import patch, Mock, MagicMock
 
 from model.transaction_database import (
     TransactionData,
     QueryTransactionData,
     TransactionDatabase,
 )
-from controller.transaction import create_transaction
+from controller.transaction import create_transaction, query_user_transactions
 
 
 class TestTransaction(unittest.TestCase):
@@ -54,6 +55,60 @@ class TestTransaction(unittest.TestCase):
         transction_database.delete(retrieved_data[0].transaction_id)
 
         # TODO: update item db relate function
+
+    @patch("controller.transaction.TransactionDatabase")
+    def test_get_user_transactions(self, mock_database_class):
+        """
+        Test retrieving transactions for a specific user
+        """
+        mock_instance = MagicMock()
+        mock_transaction1 = MagicMock()
+        mock_transaction1.to_dict.return_value = {
+            "transaction_id": 0,
+            "user_id": 0,
+            "category": "food",
+            "product_name": "apple",
+            "quantity": 1,
+            "total_cost": 10,
+            "pay_by": "cash",
+            "date": datetime(2025, 1, 1),
+        }
+        mock_transaction2 = MagicMock()
+        mock_transaction2.to_dict.return_value = {
+            "transaction_id": 1,
+            "user_id": 0,
+            "category": "food",
+            "product_name": "banana",
+            "quantity": 1,
+            "total_cost": 20,
+            "pay_by": "cash",
+            "date": datetime(2025, 1, 1),
+        }
+        mock_instance.query.return_value = [mock_transaction1, mock_transaction2]
+        mock_database_class.return_value = mock_instance
+        excepted_data = [
+            {
+                "transaction_id": 0,
+                "category": "food",
+                "product_name": "apple",
+                "quantity": 1,
+                "total_cost": 10,
+                "pay_by": "cash",
+                "date": datetime(2025, 1, 1),
+            },
+            {
+                "transaction_id": 1,
+                "category": "food",
+                "product_name": "banana",
+                "quantity": 1,
+                "total_cost": 20,
+                "pay_by": "cash",
+                "date": datetime(2025, 1, 1),
+            },
+        ]
+
+        data = query_user_transactions({"user_id": 0})
+        self.assertEqual(data, excepted_data)
 
 
 if __name__ == "__main__":
