@@ -5,3 +5,4 @@ my.cnf
 nginx.conf
 nginx/certs
 config.yaml
+mysql_data

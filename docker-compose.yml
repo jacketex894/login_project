@@ -61,6 +61,7 @@ services:
       - "${DATABASE_PORT}:${DATABASE_PORT}"
     volumes:
       - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./mysql/mysql_data:/var/lib/mysql
     networks:
       - app-network
 networks:
