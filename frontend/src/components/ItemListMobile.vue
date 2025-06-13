@@ -25,6 +25,7 @@ export default {
   },
   methods: {
     async showList() {
+      this.items = [];
       let response =  await get_transaction_record();
       let transactions = response['transactions'];
       for (let i = 0; i < transactions.length; i++) {
