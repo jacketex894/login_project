@@ -59,14 +59,14 @@ export default {
                 let response = await login(userData);
                 this.showAlert = "true"
                 this.alertMessage = "Login sucess"
-                this.alertType = 'success'        
+                this.alertType = 'success'    
+                this.$router.push("/spending-analysis")    
             }
             catch (error){
                 this.showAlert = "true"
                 this.alertMessage = "Login fail : The user name or password  is wrong, please check."
                 this.alertType = 'error'
             }
-            this.$router.push("/spending-analysis")
         }
     }
 }
