@@ -103,6 +103,17 @@ export default {
     place-items: center;
     z-index: 2;
   }
-  .submitButton{
+  @media (max-width: 768px) {
+    .register-container{
+    width: 80vw;
+    height: 80vh;
+    }
+    .register-sheet {
+        width: 70vw;
+        height: 60vh;
+    }
+    .register-title{
+        width: 60vw;
+    }
   }
 </style>

@@ -101,4 +101,17 @@ export default {
   .submitButton{
     top:10vh;
   }
+  @media (max-width: 768px) {
+  .login-container{
+    width: 80vw;
+    height: 80vh;
+    }
+  .login-sheet {
+    width: 70vw;
+    height: 60vh;
+  }
+  .login-title{
+    width: 60vw;
+  }
+}
 </style>
