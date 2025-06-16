@@ -88,4 +88,4 @@ sed -e "s/\${MYSQL_PASSWORD}/$MYSQL_PASSWORD/g" \
 
 echo "Frontend run at http://localhost:$FRONTEND_PORT"
 echo "Auth service run at http://localhost:$AUTH_SERVICE_PORT"
-echo "Database run at http://localhost:$BACKEND_PORT"
+echo "Database run at http://localhost:$DATABASE_PORT"
