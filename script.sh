@@ -6,7 +6,7 @@ if [ ! -f "$ENV_FILE" ]; then
   echo ".env file does not exist, generating a new one from envsample..."
   ENV_SAMPLE_CONTENT=$(cat "$ENV_SAMPLE_FILE")
 
-  BACKEND_PORT=$((RANDOM % 10001 + 10000))
+  AUTH_SERVICE_PORT=$((RANDOM % 10001 + 10000))
   EXPENSE_SERVICE_PORT=$((RANDOM % 10001 + 10000))
   FRONTEND_PORT=$((RANDOM % 10001 + 10000))
   HTTPS_PORT=$((RANDOM % 10001 + 10000))
@@ -14,7 +14,8 @@ if [ ! -f "$ENV_FILE" ]; then
   MYSQL_ROOT_PASSWORD=$(openssl rand -base64 12 | tr -dc 'A-Za-z0-9' | head -c 16)
   TOKEN_SECRET_KEY=$(openssl rand -base64 12 | tr -dc 'A-Za-z0-9' | head -c 16)
   NEW_ENV_CONTENT=$(echo "$ENV_SAMPLE_CONTENT" | \
-        sed "s/BACKEND_PORT=[^ ]*/BACKEND_PORT=$BACKEND_PORT/" | \
+        sed "s/AUTH_SERVICE_PORT=[^ ]*/AUTH_SERVICE_PORT=$AUTH_SERVICE_PORT/" | \
+        sed "s/EXPENSE_SERVICE_PORT=[^ ]*/EXPENSE_SERVICE_PORT=$EXPENSE_SERVICE_PORT/" | \
         sed "s/FRONTEND_PORT=[^ ]*/FRONTEND_PORT=$FRONTEND_PORT/" | \
         sed "s/HTTPS_PORT=[^ ]*/HTTPS_PORT=$HTTPS_PORT/" | \
         sed "s/DATABASE_PORT=[^ ]*/DATABASE_PORT=$DATABASE_PORT/" | \
@@ -25,7 +26,7 @@ fi
 
 source $ENV_FILE
 
-export BACKEND_PORT=$BACKEND_PORT
+export AUTH_SERVICE_PORT=$AUTH_SERVICE_PORT
 export EXPENSE_SERVICE_PORT=$EXPENSE_SERVICE_PORT
 export FRONTEND_PORT=$FRONTEND_PORT
 export HTTPS_PORT=$HTTPS_PORT
@@ -63,7 +64,7 @@ if [ -z "$FRONTEND_PORT" ]; then
 fi
 
 sed -e "s/\${FRONTEND_PORT}/$FRONTEND_PORT/g" \
-    -e "s/\${BACKEND_PORT}/$BACKEND_PORT/g" \
+    -e "s/\${AUTH_SERVICE_PORT}/$AUTH_SERVICE_PORT/g" \
     -e "s/\${HTTPS_PORT}/$HTTPS_PORT/g" \
     -e "s/\${EXPENSE_SERVICE_PORT}/$EXPENSE_SERVICE_PORT/g" \
     $NGINX_TEMPLATE_FILE > $NGINX_CONFIG_FILE
@@ -86,6 +87,5 @@ sed -e "s/\${MYSQL_PASSWORD}/$MYSQL_PASSWORD/g" \
 # docker compose up -d
 
 echo "Frontend run at http://localhost:$FRONTEND_PORT"
-echo "Backend run at http://localhost:$BACKEND_PORT"
+echo "Auth service run at http://localhost:$AUTH_SERVICE_PORT"
 echo "Database run at http://localhost:$BACKEND_PORT"
-echo "Check api document at http://localhost:$BACKEND_PORT/redoc"
