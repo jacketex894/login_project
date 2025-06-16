@@ -4,7 +4,7 @@ services:
     env_file:
       - .env
     environment:
-      - BACKEND_PORT=${BACKEND_PORT}
+      - AUTH_SERVICE_PORT=${AUTH_SERVICE_PORT}
     volumes:
       - ./backend/core:/app/core
       - ./backend/auth-service/model:/app/model
@@ -13,7 +13,7 @@ services:
       - ./backend/auth-service/controller:/app/controller
     container_name: auth-service
     ports:
-      - "${BACKEND_PORT}:${BACKEND_PORT}"
+      - "${AUTH_SERVICE_PORT}:${AUTH_SERVICE_PORT}"
     networks:
       - app-network
   expense-service:

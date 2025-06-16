@@ -12,4 +12,4 @@ RUN poetry install
 
 COPY ./main.py /app/
 
-CMD ["sh", "-c", "poetry run uvicorn main:app --host 0.0.0.0 --port $BACKEND_PORT --reload"]
+CMD ["sh", "-c", "poetry run uvicorn main:app --host 0.0.0.0 --port $AUTH_SERVICE_PORT --reload"]
