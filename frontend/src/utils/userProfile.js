@@ -1,4 +1,4 @@
-const BASE_URL = '/api';
+const BASE_URL = '/auth';
 
 export function login(userData){
     return fetch(`${BASE_URL}/login`,{

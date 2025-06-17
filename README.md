@@ -1,6 +1,10 @@
 # login-project
 
-This project is designed to help me learn how to set up frontend-backend communication, handle database operations, and understand the registration and login processes. It includes a frontend, backend, and a database, all managed and started via Docker Compose.
+This project helps me learn how to build full-stack applications by connecting a frontend with backend services, working with databases, and implementing user registration and login flows.
+
+It features a frontend, an auth-service, an expense-service, and a database, all orchestrated using Docker Compose.
+
+On the backend, I used a microservices approach with MVC structure and implemented JWT authentication for secure access control.
 
 
 ## Technology Stack
@@ -28,23 +32,42 @@ This project is designed to help me learn how to set up frontend-backend communi
    You need to set up environment variables in the .env file.
    
    You can either create it manually based on the env_template or let the script generate it for you.
+   Run the following command:
+    ```
+    ./gen_env.sh
+    ```
     * .env file:
     ```
-    BACKEND_PORT= 
-    FRONTEND_PORT=
+    AUTH_SERVICE_PORT= 
+    EXPENSE_SERVICE_PORT=
     DATABASE_PORT=
+    DOMAIN_NAME=(default is local.test)
     MYSQL_ROOT_PASSWORD=
-    CREATE_CERT=
+    CREATE_CERT=(default is true)
+    TOKEN_SECRET_KEY=
     ```
 
-4. Start the Service
+    Use AUTH_SERVICE_PORT,EXPENSE_SERVICE_PORT as backend service port.
+
+    Use DATABASE_PORT as database port.
+
+    Use DOMAIN_NAME as your web application domain name.
+
+    * In windows you need to add `127.0.0.1 local.test`to C:\Windows\System32\drivers\etc\hosts if you want to activate on local.
+
+    Use MYSQL_ROOT_PASSWORD as your mysql db password.
+    
+    CREATE_CERT need to be true if you don't have certificates for https. 
+
+    TOKEN_SECRET_KEY use for encrypt jwt token.
+
+3. Start the Service
     Run the following command:
     ```
     ./script.sh
     ```
     This script will:
    
-   * Create the `.env` file if it doesn’t exist.
    * Generate SQL settings based on `.env`.
    * Generate the SSL certificate if `CREATE_CERT=true`.
    * Generate Nginx settings based on `.env`.
@@ -53,15 +76,11 @@ This project is designed to help me learn how to set up frontend-backend communi
    * Start the following containers in the background:
       * Nginx (Reverse Proxy and Frontend Service)
       * MySQL Database
-      * Backend FastAPI service
-   * Display the following URLs:
-      * Frontend
-      * Backend
-      * Database
-      * API Documentation
+      * auth-service
+      * expense-service
 
 ## Access the Application
-After running the script, you can access the application by navigating to the URLs displayed by the script in your browser.
+After running the script, you can access the application by navigating to the URL `https://local.test`.
    
 ## Note: 
 If `CREATE_CERT=true`, you may see a "Your connection is not private" warning in your browser. 

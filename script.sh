@@ -5,9 +5,8 @@ source $ENV_FILE
 
 export AUTH_SERVICE_PORT=$AUTH_SERVICE_PORT
 export EXPENSE_SERVICE_PORT=$EXPENSE_SERVICE_PORT
-export FRONTEND_PORT=$FRONTEND_PORT
-export HTTPS_PORT=$HTTPS_PORT
 export DATABASE_PORT=$DATABASE_PORT
+export DOMAIN_NAME=$DOMAIN_NAME
 export MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
 export MYSQL_PASSWORD=$MYSQL_ROOT_PASSWORD
 export TOKEN_SECRET_KEY=$TOKEN_SECRET_KEY
@@ -35,15 +34,10 @@ fi
 NGINX_TEMPLATE_FILE="./nginx/nginx_template.conf"
 NGINX_CONFIG_FILE="./nginx/nginx.conf"
 
-if [ -z "$FRONTEND_PORT" ]; then
-  echo "Error: FRONTEND_PORT not found in $ENV_FILE"
-  exit 1
-fi
 
-sed -e "s/\${FRONTEND_PORT}/$FRONTEND_PORT/g" \
-    -e "s/\${AUTH_SERVICE_PORT}/$AUTH_SERVICE_PORT/g" \
-    -e "s/\${HTTPS_PORT}/$HTTPS_PORT/g" \
+sed -e "s/\${AUTH_SERVICE_PORT}/$AUTH_SERVICE_PORT/g" \
     -e "s/\${EXPENSE_SERVICE_PORT}/$EXPENSE_SERVICE_PORT/g" \
+    -e "s/\${DOMAIN_NAME}/$DOMAIN_NAME/g" \
     $NGINX_TEMPLATE_FILE > $NGINX_CONFIG_FILE
 
 #frontend
@@ -61,7 +55,5 @@ sed -e "s/\${MYSQL_PASSWORD}/$MYSQL_PASSWORD/g" \
     -e "s/\${TOKEN_SECRET_KEY}/$TOKEN_SECRET_KEY/g" \
     $BACKEND_TEMPLATE_FILE > $BACKEND_CONFIG_FILE
 
-# docker compose up -d
+docker compose up -d
 
-echo "Frontend run at http://localhost:$FRONTEND_PORT"
-echo "Database run at http://localhost:$DATABASE_PORT"

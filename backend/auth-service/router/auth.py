@@ -21,7 +21,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/api/register",
+    "/register",
     tags=["users"],
     response_model=dict,
     responses={
@@ -56,7 +56,7 @@ def user_register(register_request: RegisterRequest, request: Request):
 
 
 @router.post(
-    "/api/login",
+    "/login",
     tags=["users"],
     response_model=dict,
     responses={

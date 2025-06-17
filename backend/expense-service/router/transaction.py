@@ -15,7 +15,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/expense/transaction",
+    "/transaction",
     tags=["expense"],
     response_model=dict,
     responses={
@@ -40,7 +40,7 @@ def create_transaction_record(
 
 
 @router.get(
-    "/expense/transaction",
+    "/transaction",
     tags=["expense"],
     response_model=dict,
     responses={
